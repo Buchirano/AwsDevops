@@ -1,7 +1,7 @@
 pipeline {
   environment {
     imagename = "helloworld"
-    ecrurl = "298436085140.dkr.ecr.us-east-1.amazonaws.com"
+    ecrurl = "369452779141.dkr.ecr.us-east-1.amazonaws.com"
     ecrcredentials = "ecr:us-east-i:helloworld"
     dockerImage = ''
   } 
@@ -24,7 +24,7 @@ pipeline {
     stage('Push') {
       steps {
         script{
-          docker.withRegistry("https://298436085140.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:my.aws.credentials") {
+          docker.withRegistry("https://369452779141.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:my.aws.credentials") {
             docker.image("helloworld").push()
           }
         }
@@ -32,17 +32,11 @@ pipeline {
     }
 
  
-    stage('Remove Unused docker image - Master') {
-      when {
-      anyOf {
-            branch 'master'
-      }
-     }
-      steps{
-        sh "docker rmi $imagename:$BUILD_NUMBER"
-         sh "docker rmi $imagename:latest"
+    stage('Deploy'){
+            steps {
+                 sh 'kubectl apply -f deployment.yml'
+            }
+        }
 
-      }
-    } // End of remove unused docker image for master
-  }  
-} //end of pipeline
+    }
+}
